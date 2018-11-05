@@ -69,6 +69,10 @@ module Spree
       # Verify secret_token
       render(inline: 'Invalid secret token', status: 404) and return if payment.source.secret_token != params[:secret_token]
 
+      # Verify order amount
+      order_amount = order.total * 100
+      render(inline: 'Invalid order amount', status: 405) and return if params[:receive_amount].to_i < order_amount.to_i
+
       transaction = payment.source
       transaction.order_id = params[:id]
       transaction.save
